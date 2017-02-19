@@ -146,6 +146,8 @@ class CrontabSchedule(models.Model):
         _('month of year'), max_length=64, default='*',
     )
 
+    nowfun = PickledObjectField(_('nowfun'), default=None)
+
     class Meta:
         verbose_name = _('crontab')
         verbose_name_plural = _('crontabs')
@@ -167,7 +169,8 @@ class CrontabSchedule(models.Model):
                                  hour=self.hour,
                                  day_of_week=self.day_of_week,
                                  day_of_month=self.day_of_month,
-                                 month_of_year=self.month_of_year)
+                                 month_of_year=self.month_of_year,
+                                 nowfun=self.nowfun)
 
     @classmethod
     def from_schedule(cls, schedule):
@@ -175,7 +178,8 @@ class CrontabSchedule(models.Model):
                 'hour': schedule._orig_hour,
                 'day_of_week': schedule._orig_day_of_week,
                 'day_of_month': schedule._orig_day_of_month,
-                'month_of_year': schedule._orig_month_of_year}
+                'month_of_year': schedule._orig_month_of_year,
+                'nowfun': schedule.nowfun}
         try:
             return cls.objects.get(**spec)
         except cls.DoesNotExist:
