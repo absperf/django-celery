@@ -146,7 +146,7 @@ class CrontabSchedule(models.Model):
         _('month of year'), max_length=64, default='*',
     )
 
-    nowfun = PickledObjectField(_('nowfun'), default=None)
+    nowfun = PickledObjectField(_('nowfun'), null=True, default=None)
 
     class Meta:
         verbose_name = _('crontab')

@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='crontabschedule',
             name='nowfun',
-            field=djcelery.picklefield.PickledObjectField(default=None, editable=False),
+            field=djcelery.picklefield.PickledObjectField(default=None, null=True, editable=False),
         ),
     ]
