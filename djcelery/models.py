@@ -246,7 +246,7 @@ class PeriodicTask(models.Model):
     description = models.TextField(_('description'), blank=True)
 
     timezone = models.CharField(_('timezone'), max_length=128, null=True,
-            blank=True)
+            blank=True, default='UTC')
 
     objects = managers.PeriodicTaskManager()
     no_changes = False

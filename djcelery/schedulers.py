@@ -95,7 +95,6 @@ class ModelEntry(ScheduleEntry):
         obj = type(self.model)._default_manager.get(pk=self.model.pk)
         for field in self.save_fields:
             setattr(obj, field, getattr(self.model, field))
-        obj.last_run_at = maybe_make_aware(obj.last_run_at)
         obj.save()
 
     @classmethod
