@@ -10,7 +10,7 @@ from celery import schedules
 from celery.beat import Scheduler, ScheduleEntry
 from celery.utils.encoding import safe_str, safe_repr
 from celery.utils.log import get_logger
-from celery.utils.timeutils import is_naive
+from celery.utils.timeutils import maybe_make_aware
 
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
@@ -18,7 +18,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from .db import commit_on_success
 from .models import (PeriodicTask, PeriodicTasks,
                      CrontabSchedule, IntervalSchedule)
-from .utils import DATABASE_ERRORS, make_aware
+from .utils import DATABASE_ERRORS
 from .compat import itervalues
 
 # This scheduler must wake up more frequently than the
@@ -68,9 +68,6 @@ class ModelEntry(ScheduleEntry):
         if not model.last_run_at:
             model.last_run_at = self.model.schedule.now()
         orig = self.last_run_at = model.last_run_at
-        if not is_naive(self.last_run_at):
-            self.last_run_at = self.last_run_at.replace(tzinfo=None)
-        assert orig.hour == self.last_run_at.hour  # timezone sanity
 
     def _disable(self, model):
         model.no_changes = True
@@ -98,7 +95,7 @@ class ModelEntry(ScheduleEntry):
         obj = type(self.model)._default_manager.get(pk=self.model.pk)
         for field in self.save_fields:
             setattr(obj, field, getattr(self.model, field))
-        obj.last_run_at = make_aware(obj.last_run_at)
+        obj.last_run_at = maybe_make_aware(obj.last_run_at)
         obj.save()
 
     @classmethod
