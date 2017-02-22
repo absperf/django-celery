@@ -18,6 +18,8 @@ from .picklefield import PickledObjectField
 from .utils import now
 from .compat import python_2_unicode_compatible
 
+import pytz
+
 ALL_STATES = sorted(states.ALL_STATES)
 TASK_STATE_CHOICES = sorted(zip(ALL_STATES, ALL_STATES))
 
@@ -233,7 +235,7 @@ class PeriodicTask(models.Model):
     enabled = models.BooleanField(
         _('enabled'), default=True,
     )
-    last_run_at = models.DateTimeField(
+    _last_run_at = models.DateTimeField(
         auto_now=False, auto_now_add=False,
         editable=False, blank=True, null=True,
     )
@@ -242,6 +244,9 @@ class PeriodicTask(models.Model):
     )
     date_changed = models.DateTimeField(auto_now=True)
     description = models.TextField(_('description'), blank=True)
+
+    timezone = models.CharField(_('timezone'), max_length=128, null=True,
+            blank=True)
 
     objects = managers.PeriodicTaskManager()
     no_changes = False
@@ -282,10 +287,23 @@ class PeriodicTask(models.Model):
         if self.crontab:
             return self.crontab.schedule
 
+    @property
+    def last_run_at(self):
+        # This is necessary to fully respect timezones
+        if self.timezone:
+            return self._last_run_at.astimezone(pytz.timezone(self.timezone))
+        else:
+            return self._last_run_at
+        
+
+    @last_run_at.setter
+    def last_run_at(self, value):
+        # Django's timezone facilities should store this properly regardless
+        self._last_run_at = value
+
 
 signals.pre_delete.connect(PeriodicTasks.changed, sender=PeriodicTask)
 signals.pre_save.connect(PeriodicTasks.changed, sender=PeriodicTask)
-
 
 class WorkerState(models.Model):
     hostname = models.CharField(_('hostname'), max_length=255, unique=True)

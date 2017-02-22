@@ -249,10 +249,9 @@ class DatabaseScheduler(Scheduler):
         if update:
             self.sync()
             self._schedule = self.all_as_schedule()
-            if logger.isEnabledFor(logging.DEBUG):
-                debug('Current schedule:\n%s', '\n'.join(
-                    repr(entry) for entry in itervalues(self._schedule)),
-                )
+            debug('Current schedule:\n%s', '\n'.join(
+                repr(entry) for entry in itervalues(self._schedule)),
+            )
         return self._schedule
 
     @classmethod
