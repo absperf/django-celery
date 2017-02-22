@@ -290,7 +290,7 @@ class PeriodicTask(models.Model):
     @property
     def last_run_at(self):
         # This is necessary to fully respect timezones
-        if self.timezone:
+        if self.timezone and self._last_run_at:
             return self._last_run_at.astimezone(pytz.timezone(self.timezone))
         else:
             return self._last_run_at
