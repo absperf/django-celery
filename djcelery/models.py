@@ -172,23 +172,6 @@ class CrontabSchedule(models.Model):
                                  month_of_year=self.month_of_year,
                                  nowfun=self.nowfun)
 
-    @classmethod
-    def from_schedule(cls, schedule):
-        spec = {'minute': schedule._orig_minute,
-                'hour': schedule._orig_hour,
-                'day_of_week': schedule._orig_day_of_week,
-                'day_of_month': schedule._orig_day_of_month,
-                'month_of_year': schedule._orig_month_of_year,
-                'nowfun': schedule.nowfun}
-        try:
-            return cls.objects.get(**spec)
-        except cls.DoesNotExist:
-            return cls(**spec)
-        except MultipleObjectsReturned:
-            cls.objects.filter(**spec).delete()
-            return cls(**spec)
-
-
 class PeriodicTasks(models.Model):
     ident = models.SmallIntegerField(default=1, primary_key=True, unique=True)
     last_update = models.DateTimeField(null=False)

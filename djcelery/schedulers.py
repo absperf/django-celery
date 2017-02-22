@@ -66,7 +66,7 @@ class ModelEntry(ScheduleEntry):
         self.model = model
 
         if not model.last_run_at:
-            model.last_run_at = self._default_now()
+            model.last_run_at = self.model.schedule.now()
         orig = self.last_run_at = model.last_run_at
         if not is_naive(self.last_run_at):
             self.last_run_at = self.last_run_at.replace(tzinfo=None)
@@ -83,10 +83,10 @@ class ModelEntry(ScheduleEntry):
         return self.schedule.is_due(self.last_run_at)
 
     def _default_now(self):
-        return self.app.now()
+        return self.model.schedule.now()
 
     def __next__(self):
-        self.model.last_run_at = self.app.now()
+        self.model.last_run_at = self.model.schedule.now()
         self.model.total_run_count += 1
         self.model.no_changes = True
         return self.__class__(self.model)
