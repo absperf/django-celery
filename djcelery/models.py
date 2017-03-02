@@ -116,13 +116,7 @@ class IntervalSchedule(models.Model):
     @classmethod
     def from_schedule(cls, schedule, period='seconds'):
         every = max(schedule.run_every.total_seconds(), 0)
-        try:
-            return cls.objects.get(every=every, period=period)
-        except cls.DoesNotExist:
-            return cls(every=every, period=period)
-        except MultipleObjectsReturned:
-            cls.objects.filter(every=every, period=period).delete()
-            return cls(every=every, period=period)
+        return cls(every=every, period=period)
 
     def __str__(self):
         if self.every == 1:
@@ -173,6 +167,18 @@ class CrontabSchedule(models.Model):
                                  day_of_month=self.day_of_month,
                                  month_of_year=self.month_of_year,
                                  nowfun=self.nowfun)
+
+    @classmethod
+    def from_schedule(cls, schedule):
+        spec = {'minute': schedule._orig_minute,
+                'hour': schedule._orig_hour,
+                'day_of_week': schedule._orig_day_of_week,
+                'day_of_month': schedule._orig_day_of_month,
+                'month_of_year': schedule._orig_month_of_year,
+                'nowfun': schedule.nowfun}
+
+        return cls(**spec)
+
 
 class PeriodicTasks(models.Model):
     ident = models.SmallIntegerField(default=1, primary_key=True, unique=True)
