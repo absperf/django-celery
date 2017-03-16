@@ -298,7 +298,7 @@ class PeriodicTask(models.Model):
         # This is necessary to fully respect timezones.  All timezones should
         # always be TZ-aware
         if self.timezone:
-            timezone = pytz.timezone(self.timezone))
+            timezone = pytz.timezone(self.timezone)
         else:
             timezone = pytz.utc
 
