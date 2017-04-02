@@ -295,14 +295,14 @@ class PeriodicTask(models.Model):
 
     @property
     def last_run_at(self):
-        # This is necessary to fully respect timezones.  All timezones should
-        # always be TZ-aware
-        if self.timezone:
-            timezone = pytz.timezone(self.timezone)
-        else:
-            timezone = pytz.utc
-
         if self._last_run_at:
+            # This is necessary to fully respect timezones.  All timezones should
+            # always be TZ-aware
+            if self.timezone:
+                timezone = pytz.timezone(self.timezone)
+            else:
+                timezone = pytz.utc
+
             return self._last_run_at.astimezone(timezone)
         else:
             return self._last_run_at
